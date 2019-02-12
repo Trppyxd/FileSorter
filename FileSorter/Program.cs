@@ -11,11 +11,13 @@ namespace FileSorter
 {
     class Program
     {
+        public static string DirectoryPath = string.Empty;
         static void Main(string[] args)
         {
-            string directoryPath = "";
+            string directoryPath = DirectoryPath;
             DirectoryInfo directoryInfo;
 
+            
             while (directoryPath == "")
             {
                 Console.WriteLine("Enter directory path: ");
@@ -31,10 +33,17 @@ namespace FileSorter
                         Console.Clear();
                     }
                 }
-                catch (Exception)
+                catch (DirectoryNotFoundException)
                 {
                     directoryPath = "";
                     Console.Clear();
+                    Console.WriteLine("Invalid directory path, try again!");
+                }
+                catch (Exception e)
+                {
+                    directoryPath = "";
+                    Console.Clear();
+                    Console.WriteLine("Invalid directory path, try again!");
                 }
             }
 
