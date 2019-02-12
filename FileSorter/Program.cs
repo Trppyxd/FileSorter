@@ -3,6 +3,7 @@ using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -42,15 +43,27 @@ namespace FileSorter
 
             var files = directoryInfo.GetFiles();
             var subDirectories = directoryInfo.GetDirectories();
+
             foreach (var file in files)
             {
-                if (from dir in subDirectories where dir.Extension == files.) // fuck my life
+                string fileExt = file.Extension.TrimStart('.');
+                string fileSourceName = file.FullName;
+                string fileDestName = $@"{directoryPath}\{fileExt}\{file.Name}";
+
+                if (!Directory.Exists($@"{directoryPath}\{fileExt}"))
                 {
-                    
+                    Directory.CreateDirectory($@"{directoryPath}\{fileExt}");
+                    Console.WriteLine($"Created directory {fileExt}");
                 }
-                Console.WriteLine(file.Name);
-                
+
+                if (!File.Exists(fileDestName))
+                {
+                    File.Move(fileSourceName, fileDestName);
+                    Console.WriteLine($@"Moved .\{file.Name} TO .\{fileExt}\{file.Name}");
+                }
             }
+            Console.WriteLine("Completed");
+            Console.ReadLine();
         }
     }
 }
