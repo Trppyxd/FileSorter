@@ -46,7 +46,7 @@ namespace FileSorter
             
             while (directoryPath == "")
             {
-                Console.WriteLine("Enter directory path: ");
+                Console.WriteLine("Enter directory path to sort: ");
                 directoryPath = Console.ReadLine();
 
                 try
@@ -63,7 +63,7 @@ namespace FileSorter
                 {
                     directoryPath = "";
                     //Console.Clear();
-                    Console.WriteLine("Invalid directory path, try again!");
+                    Console.WriteLine("[ERROR] Invalid directory path, try again!");
                 }
             }
 
@@ -82,7 +82,7 @@ namespace FileSorter
                 if (!Directory.Exists($@"{directoryPath}\{fileExt}"))
                 {
                     Directory.CreateDirectory($@"{directoryPath}\{fileExt}");
-                    Console.WriteLine($"Created directory {fileExt}");
+                    Console.WriteLine($"[CREATE] directory {fileExt}");
                 }
 
                 if (!File.Exists(fileDestName))
@@ -92,20 +92,23 @@ namespace FileSorter
                     {
                         try
                         {
-                            var fInfo = new FileInfo(fileSourceName);
                             File.Move(fileSourceName, fileDestName);
-                            
-                            Console.WriteLine($@"Moved .\{file.Name} >> .\{fileExt}\{file.Name}");
+
+                            Console.WriteLine($@"[MOVE] .\{file.Name} >> .\{fileExt}\{file.Name}");
                             loop = false;
                         }
-                        catch (Exception e)
+                        catch (IOException)
                         {
-                            Console.WriteLine($"[ERROR] {e.Message} {Environment.NewLine}" +
-                                              $"The file {file.Name} is in use by another process, waiting 5 sec!");
-                            System.Threading.Thread.Sleep(5000);
+                            Console.WriteLine($"[ERROR] The process can't access {file.Name}, the file is in use by another process!");
+                            
 
+                            loop = false;
+                        }
+                        catch (Exception)
+                        {
                             loop = true;
                         }
+
 
                     }
                 }
