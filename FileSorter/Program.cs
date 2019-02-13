@@ -1,6 +1,7 @@
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -17,6 +18,31 @@ namespace FileSorter
             string directoryPath = DirectoryPath;
             DirectoryInfo directoryInfo;
 
+            Console.WriteLine("Enter \"Y\" to create randomly generated files for testing purposes.");
+            var input = Console.ReadLine().ToLower();
+            if (input == "y")
+            {
+                bool loop = true;
+
+                while (loop)
+                {
+                    try
+                    {
+                        Console.WriteLine("Enter target path:");
+                        string targetDirectory = Console.ReadLine();
+                        Console.WriteLine("Enter file amount: ");
+                        int fileAmount = int.Parse(Console.ReadLine() ?? throw new InvalidOperationException());
+
+                        Utilities.CreateTestFiles(targetDirectory, fileAmount);
+                        loop = false;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"[ERROR] {e.Message}");
+                        loop = true;
+                    }
+                }
+            }
             
             while (directoryPath == "")
             {
@@ -33,16 +59,10 @@ namespace FileSorter
                         Console.Clear();
                     }
                 }
-                catch (DirectoryNotFoundException)
-                {
-                    directoryPath = "";
-                    Console.Clear();
-                    Console.WriteLine("Invalid directory path, try again!");
-                }
                 catch (Exception e)
                 {
                     directoryPath = "";
-                    Console.Clear();
+                    //Console.Clear();
                     Console.WriteLine("Invalid directory path, try again!");
                 }
             }
@@ -67,8 +87,27 @@ namespace FileSorter
 
                 if (!File.Exists(fileDestName))
                 {
-                    File.Move(fileSourceName, fileDestName);
-                    Console.WriteLine($@"Moved .\{file.Name} TO .\{fileExt}\{file.Name}");
+                    bool loop = true;
+                    while (loop)
+                    {
+                        try
+                        {
+                            var fInfo = new FileInfo(fileSourceName);
+                            File.Move(fileSourceName, fileDestName);
+                            
+                            Console.WriteLine($@"Moved .\{file.Name} >> .\{fileExt}\{file.Name}");
+                            loop = false;
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine($"[ERROR] {e.Message} {Environment.NewLine}" +
+                                              $"The file {file.Name} is in use by another process, waiting 5 sec!");
+                            System.Threading.Thread.Sleep(5000);
+
+                            loop = true;
+                        }
+
+                    }
                 }
             }
             Console.WriteLine("Completed");
